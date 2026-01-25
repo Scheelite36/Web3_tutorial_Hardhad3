@@ -1,4 +1,6 @@
 import {network} from "hardhat";
+import hre from "hardhat";
+import { verifyContract } from "@nomicfoundation/hardhat-verify/verify";
 
 async function main() {
     // 锁定期为 7 天（以秒为单位）
@@ -15,7 +17,15 @@ async function main() {
     
     console.log(`✅ 合约部署成功!`);
     console.log(`合约地址: ${fundMe.address}`);
-    
+    // 验证合约
+    await verifyContract(
+      {
+        address: `${fundMe.address}`,
+        constructorArgs: [BigInt(lockTime)],
+        provider: "sourcify", // or "blockscout", or "sourcify"
+      },
+      hre,
+    );
     return fundMe;
 
 }
