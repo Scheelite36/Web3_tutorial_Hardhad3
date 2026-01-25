@@ -1,0 +1,32 @@
+{
+  "name": "web3_tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.0.7",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.2",
+    "@types/node": "^22.19.7",
+    "dotenv": "^17.2.3",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "global-agent": "^3.0.0",
+    "hardhat": "^3.1.5",
+    "typescript": "~5.8.0",
+    "viem": "^2.44.4"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^1.5.0",
+    "@nomicfoundation/hardhat-ethers": "^4.0.4",
+    "@nomicfoundation/solidity-analyzer-linux-x64-gnu": "^0.1.2",
+    "ethers": "^6.16.0",
+    "https-proxy-agent": "^7.0.6",
+    "node-fetch": "^3.3.2",
+    "socks-proxy-agent": "^8.0.5"
+  }
+}

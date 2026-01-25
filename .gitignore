@@ -1,0 +1,28 @@
+# Node modules
+/node_modules
+
+# Compilation output
+/dist
+
+# pnpm deploy output
+/bundle
+
+# Hardhat Build Artifacts
+/artifacts
+
+# Hardhat compilation (v2) support directory
+/cache
+
+# Typechain output
+/types
+
+# Hardhat coverage reports
+/coverage
+
+# Environment variables (使用 Hardhat Keystore 替代)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
