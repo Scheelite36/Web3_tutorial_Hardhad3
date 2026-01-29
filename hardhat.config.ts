@@ -1,35 +1,21 @@
 import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
 import hardhatVerify from "@nomicfoundation/hardhat-verify";
-import { configVariable, defineConfig } from "hardhat/config";
+import { configVariable, defineConfig, task } from "hardhat/config";
 import "dotenv/config";
-import "global-agent/bootstrap"; // 全局代理支持
+import "global-agent/bootstrap";
 
 // 确保环境变量存在
 if (!process.env.SEPOLIA_RPC_URL) {
   throw new Error("请设置 SEPOLIA_RPC_URL 环境变量");
 }
 
-// 创建自定义网络配置函数
-// const createNetworkConfig = (url: string, chainId?: number) => {
-//   const config: any = {
-//     type: "http",
-//     chainType: "l1",
-//     url,
-//     accounts: process.env.SEPOLIA_PRIVATE_KEY
-//       ? [configVariable("SEPOLIA_PRIVATE_KEY")]
-//       : [],
-//     gas: "auto",
-//     gasPrice: "auto",
-//     gasMultiplier: 1.5,
-//     timeout: 60000,
-//   };
+const deployFundMe = task("deploy-fundme", "部署合约")
+  .setAction(() => import("./tasks/deploy-fundme.js"))
+  .build();
 
-//   if (chainId) {
-//     config.chainId = chainId;
-//   }
-
-//   return config;
-// };
+const interactFundMe = task("interact-fundme", "交互合约")
+  .setAction(() => import("./tasks/interact-fundme.js"))
+  .build();
 
 export default defineConfig({
   plugins: [hardhatToolboxViemPlugin, hardhatVerify],
@@ -76,4 +62,5 @@ export default defineConfig({
       chainId: 11155111,
     },
   },
+  tasks: [deployFundMe, interactFundMe],
 });

@@ -16,7 +16,7 @@ async function main(address: Address) {
     const hashOfGetFund: `0x${string}` = await walletClient.writeContract({
       address,
       abi: artifact.abi,
-      functionName: "getFund",
+      functionName: "refund",
     });
     const receipt = await publicClient.waitForTransactionReceipt({
         hash: hashOfGetFund,
@@ -24,7 +24,7 @@ async function main(address: Address) {
     });
     console.log(`调用 getFund 函数的交易已确认，交易哈希: ${hashOfGetFund}`);
 }
-main("0xd838338242607967c6bfd0bcec430d3a50561c51").catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
+main("0x911626fe8e3bbce94d1b8e603673d480024f2f3e").catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
 });
