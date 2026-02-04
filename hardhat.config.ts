@@ -37,10 +37,10 @@ export default defineConfig({
   },
   // 默认是`hardhat`: 通用开发环境
   networks: {
-    // 本地模拟的以太坊主网网络
-    hardhatMainnet: {
+    hardhat: {
       type: "edr-simulated",
       chainType: "l1",
+      chainId: 31337,
     },
     // 模拟 Optimism 链的环境
     hardhatOp: {
@@ -63,4 +63,9 @@ export default defineConfig({
     },
   },
   tasks: [deployFundMe, interactFundMe],
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify.dev/server",
+    browserUrl: "https://repo.ui.sourcify.dev",
+  },
 });
