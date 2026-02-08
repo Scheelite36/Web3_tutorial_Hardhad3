@@ -42,6 +42,209 @@ web3_tutorial/
 └── tsconfig.json                 # TypeScript 配置
 ```
 
+## Hardhat 2 vs Hardhat 3 对比
+
+本项目基于 Hardhat 3 开发，相比 Hardhat 2 有以下重要变化：
+
+### 1. 测试框架
+
+| 特性 | Hardhat 2 | Hardhat 3 |
+|------|-----------|-----------|
+| 测试运行器 | Mocha + Chai | node:test (Node.js 原生) |
+| 测试语法 | describe/it (Mocha) | describe/it (node:test) |
+| 断言库 | chai (推荐) | Node.js 原生 assert |
+| 模拟对象 | hardhat-network-helpers | viem + networkHelpers |
+| Gas 报告 | hardhat-gas-reporter | 内置 --gas-stats |
+
+**HH2 测试示例：**
+```typescript
+import { ethers } from "hardhat";
+import { expect } from "chai";
+
+describe("FundMe", function () {
+  it("Should set owner", async function () {
+    const FundMe = await ethers.getContractFactory("FundMe");
+    const fundMe = await FundMe.deploy();
+    expect(await fundMe.owner()).to.equal(owner.address);
+  });
+});
+```
+
+**HH3 测试示例：**
+```typescript
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { network } from "hardhat";
+
+const { viem, networkHelpers } = await network.connect();
+
+describe("FundMe", async function () {
+  it("Should set owner", async function () {
+    const fundMe = await viem.deployContract("FundMe", [3600n, mockAddr]);
+    const owner = await fundMe.read.owner();
+    assert.strictEqual(owner.toLowerCase(), expected.toLowerCase());
+  });
+});
+```
+
+### 2. 以太坊交互库
+
+| 特性 | Hardhat 2 | Hardhat 3 |
+|------|-----------|-----------|
+| 主库 | ethers.js (v5/v6) | viem (推荐) |
+| 合约工厂 | ethers.ContractFactory | viem.deployContract |
+| 合约实例 | ethers.Contract | viem.Contract |
+| 钱包连接 | ethers.getSigners() | viem.getWalletClients() |
+| 公开客户端 | new ethers.providers.JsonRpcProvider() | viem.getPublicClient() |
+| 读取调用 | contract.functions.method() | contract.read.method() |
+| 写入调用 | contract.functions.method() | contract.write.method() |
+| 事件解析 | ethers.utils.parseLogs() | parseEventLogs() |
+
+**HH2 写法：**
+```typescript
+const FundMe = await ethers.getContractFactory("FundMe");
+const fundMe = await FundMe.deploy(lockTime, dataFeed);
+await fundMe.deployed();
+
+const owner = await fundMe.owner();
+await fundMe.fund({ value: ethers.utils.parseEther("0.1") });
+```
+
+**HH3 写法：**
+```typescript
+const { viem } = await hre.network.connect();
+const publicClient = await viem.getPublicClient();
+const [walletClient] = await viem.getWalletClients();
+
+const fundMe = await viem.deployContract("FundMe", [lockTime, dataFeed]);
+
+const owner = await fundMe.read.owner();
+await fundMe.write.fund([], { value: parseEther("0.1") });
+```
+
+### 3. 部署方式
+
+| 特性 | Hardhat 2 | Hardhat 3 |
+|------|-----------|-----------|
+| 脚本部署 | hardhat run scripts/*.ts | hardhat run scripts/*.ts |
+| 部署系统 | hardhat-deploy (第三方) | Ignition (官方内置) |
+| 部署配置 | 独立的 deploy 文件 | buildModule() 声明式 |
+| 状态管理 | 手动跟踪 | 自动状态恢复 |
+| 验证插件 | @nomiclabs/hardhat-etherscan | @nomicfoundation/hardhat-verify |
+
+**HH2 部署：**
+```typescript
+// scripts/deploy.js
+async function main() {
+  const FundMe = await ethers.getContractFactory("FundMe");
+  const fundMe = await FundMe.deploy(lockTime, dataFeed);
+  console.log(`Deployed to: ${fundMe.address}`);
+}
+```
+
+**HH3 Ignition 部署：**
+```typescript
+// ignition/modules/FundMe.ts
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+export default buildModule("FundMeModule", (m) => {
+  const lockTime = 3600;
+  const fundMe = m.contract("FundMe", [lockTime, dataFeed]);
+  return { fundMe };
+});
+```
+
+运行命令：
+```bash
+npx hardhat ignition deploy ignition/modules/FundMe.ts --network sepolia
+```
+
+### 4. 网络配置
+
+| 特性 | Hardhat 2 | Hardhat 3 |
+|------|-----------|-----------|
+| 账户获取 | hardhat.config.js 中配置 | runtime 中动态获取 |
+| 网络连接 | ethers.getSigners() | viem.getWalletClients() |
+| RPC 配置 | hardhat.config.ts | hardhat.config.ts |
+| 客户端类型 | Web3Provider | PublicClient + WalletClient |
+
+**HH2 网络配置：**
+```typescript
+// hardhat.config.ts
+networks: {
+  sepolia: {
+    url: process.env.SEPOLIA_RPC_URL,
+    accounts: [process.env.PRIVATE_KEY!]
+  }
+}
+```
+
+**HH3 网络配置：**
+```typescript
+// hardhat.config.ts
+networks: {
+  sepolia: {
+    type: "http",
+    url: process.env.SEPOLIA_RPC_URL!,
+    accounts: [
+      configVariable("SEPOLIA_PRIVATE_KEY"),
+      configVariable("SEPOLIA_PRIVATE_KEY_1"),
+    ],
+    gas: "auto",
+    gasPrice: "auto",
+    chainId: 11155111,
+  }
+}
+```
+
+### 5. 第三方包集成
+
+| 包类型 | Hardhat 2 | Hardhat 3 |
+|--------|-----------|-----------|
+| 测试 | chai, mocha | node:test (原生) |
+| 以太坊库 | ethers.js | viem (推荐) |
+| Gas 报告 | hardhat-gas-reporter | --gas-stats (内置) |
+| 覆盖率 | solidity-coverage | --coverage |
+| 验证 | hardhat-etherscan | hardhat-verify |
+| Keystore | 第三方方案 | @nomicfoundation/hardhat-keystore |
+| 插件系统 | hardhat.config.ts | hardhat.config.ts (相同) |
+
+### 6. 主要依赖对比
+
+**HH2 依赖：**
+```json
+{
+  "@nomiclabs/hardhat-ethers": "^2.2.3",
+  "@nomiclabs/hardhat-waffle": "^2.0.6",
+  "chai": "^4.3.10",
+  "ethers": "^5.7.2",
+  "hardhat": "^2.19.1",
+  "hardhat-gas-reporter": "^1.0.9"
+}
+```
+
+**HH3 依赖：**
+```json
+{
+  "@nomicfoundation/hardhat-ignition": "^3.0.7",
+  "@nomicfoundation/hardhat-toolbox-viem": "^5.0.1",
+  "@nomicfoundation/hardhat-viem": "^3.0.1",
+  "hardhat": "^3.1.5",
+  "viem": "^2.44.4",
+  "node": ">=18"
+}
+```
+
+### 7. 迁移注意事项
+
+1. **合约工厂变化**：从 `ethers.getContractFactory` 改为 `viem.deployContract`
+2. **函数调用变化**：`contract.method()` 改为 `contract.read.method()` 或 `contract.write.method()`
+3. **类型变化**：大量使用 `bigint` 替代 `Number`
+4. **测试语法**：使用 `node:test` 的 `describe/it` 和 `assert` 替代 Chai 的 `expect`
+5. **时间操作**：使用 `networkHelpers.loadFixture()` 替代 `loadFixture`
+6. **事件解析**：使用 `parseEventLogs()` 替代 `query.filter`
+```
+
 ## 环境配置
 
 ### 1. 安装依赖
