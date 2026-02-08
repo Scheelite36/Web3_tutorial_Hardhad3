@@ -1,0 +1,43 @@
+{
+  "name": "web3_tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "test:gas": "hardhat test --network hardhat"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.0.7",
+    "@nomicfoundation/hardhat-ignition-viem": "^3.0.6",
+    "@nomicfoundation/hardhat-keystore": "^3.0.3",
+    "@nomicfoundation/hardhat-node-test-runner": "^3.0.8",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.1",
+    "@nomicfoundation/hardhat-verify": "^3.0.8",
+    "@nomicfoundation/hardhat-viem": "^3.0.1",
+    "@nomicfoundation/hardhat-viem-assertions": "^3.0.4",
+    "@types/node": "^22.19.7",
+    "dotenv": "^17.2.3",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "global-agent": "^3.0.0",
+    "hardhat": "^3.1.5",
+    "hardhat-gas-reporter": "^2.3.0",
+    "solidity-coverage": "^0.8.17",
+    "typescript": "~5.8.0",
+    "viem": "^2.44.4"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^1.5.0",
+    "@nomicfoundation/hardhat-ethers": "^4.0.4",
+    "@nomicfoundation/hardhat-network-helpers": "^3.0.3",
+    "@nomicfoundation/solidity-analyzer-linux-x64-gnu": "^0.1.2",
+    "ethers": "^6.16.0",
+    "https-proxy-agent": "^7.0.6",
+    "node-fetch": "^3.3.2",
+    "socks-proxy-agent": "^8.0.5"
+  }
+}
