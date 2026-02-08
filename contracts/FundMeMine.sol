@@ -9,6 +9,10 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 // 4. 在锁定期内，没有达到目标值，投资人在锁定期以后退款
 
 contract FundMe {
+    // Events
+    event FundWithdrawn(address indexed owner, uint256 amount);
+    event Funded(address indexed funder, uint256 amount);
+    
     mapping(address => uint256) public fundersToAmount;
     
     AggregatorV3Interface internal dataFeed;
@@ -75,11 +79,13 @@ contract FundMe {
       // bool success = payable(msg.sender).send(address(this).balance);
       // require(success,"fail");
       // call
+      uint256 amount = address(this).balance;
       bool success;
-      (success, ) = payable(msg.sender).call{value: address(this).balance}("");
+      (success, ) = payable(msg.sender).call{value: amount}("");
       require(success,"fail");
       require(success, "transfer tx failed");
       isFundSuccess = true;
+      emit FundWithdrawn(msg.sender, amount);
     }
 
     // 设置erc20合约地址
@@ -87,7 +93,7 @@ contract FundMe {
       erc20Addr = _erc20Addr;
     }
 
-// 供erc20合约调用，更新投资人投资金额
+    // 供erc20合约调用，更新投资人投资金额
     function setFunderToAmount(address funder, uint256 amountToUpdate) external {
       require(msg.sender== erc20Addr, "you don't have permission to call this function");
       fundersToAmount[funder] = amountToUpdate;

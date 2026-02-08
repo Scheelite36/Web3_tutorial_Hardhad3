@@ -15,6 +15,18 @@ export class NetworkConfig {
     dataFeed: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as const,
   };
 
+  // FundMe 合约配置
+  static readonly fundMe = {
+    // 最小捐款金额：1 USD
+    minUsd: 1n * 10n ** 18n,
+    // 目标金额：600 USD
+    targetUsd: 600n * 10n ** 18n,
+    // 锁定期（秒）：2分钟（用于测试）
+    lockTime: 120n,
+    // 捐款金额乘数：1.5 倍最小金额
+    fundMultiplier: 150n,
+  };
+
   /**
    * 根据网络 ID 获取对应的 dataFeed 地址
    */

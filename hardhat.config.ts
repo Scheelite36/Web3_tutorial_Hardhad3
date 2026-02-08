@@ -62,6 +62,9 @@ export default defineConfig({
       chainId: 11155111,
     },
   },
+  ignition: {
+    requiredConfirmations: 3, // 等待3个区块确认
+  },
   tasks: [deployFundMe, interactFundMe],
   sourcify: {
     enabled: true,
